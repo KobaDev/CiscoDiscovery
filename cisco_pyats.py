@@ -83,9 +83,9 @@ def get_info(device_id):
     # Step 5: disconnect from the device
     device_target.disconnect()
 
-    return d1.__dict__
+    return d1
 
-iosxr1 = get_info('iosxr1')
+iosxr1 = get_info('iosxr1').__dict__
 
 with open('test_device.json', 'w') as file:
     json.dump(iosxr1, file, indent=4)
