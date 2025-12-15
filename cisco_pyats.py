@@ -1,8 +1,9 @@
 from pyats.topology import loader
 from genie.testbed import load
 from genie.libs.parser.utils.common import get_parser
+import json
 
-
+# Tentar dois tipos de usuário (Tacacs ou local), tentar telnet se SSH não funcionar e possivelmente contemplar outros fabricantes além da Cisco (futuro)
 
 class device:
     def __init__(self,
@@ -20,11 +21,11 @@ class device:
         self.connections: list = connections
 
 
-def get_info(device):
+def get_info(device_id):
 
     # Connections
     testbed = loader.load(f'./testbed.yaml')                                            # Step 0: load the testbed
-    device_target = testbed.devices[device]                                                    # Step 1: testbed is a dictionary. Extract the device device_target
+    device_target = testbed.devices[device_id]                                                    # Step 1: testbed is a dictionary. Extract the device device_target
     device_target.connect(init_exec_commands=[], init_config_commands=[], log_stdout=False)    # Step 2: Connect to the device
 
     # Misc executables
@@ -73,16 +74,18 @@ def get_info(device):
     #     print(f"Neighbor {data['device_id']} on {data['local_interface']} "
     #         f"via {data['port_id']}")
 
+    # Mocked connected_devices
+    connected_devices = ['192.168.1.0','192.168.1.1','192.168.1.2']
 
-
-    print(cmd_show_neighbours)
-
-    # d1 = device(hostname, ips, serial_number, connected_devices, device_type, cmd_device_family)
-
-
-
+    # Instances new device
+    d1 = device(hostname, ips, serial_number, connected_devices, device_type, cmd_device_family)
 
     # Step 5: disconnect from the device
     device_target.disconnect()
 
-get_info('iosxr1')
+    return d1.__dict__
+
+iosxr1 = get_info('iosxr1')
+
+with open('test_device.json', 'w') as file:
+    json.dump(iosxr1, file, indent=4)
